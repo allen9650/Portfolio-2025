@@ -112,6 +112,7 @@ const Projects = () => {
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
+                  priority={index === 0}
                 />
               </div>
               <div className="w-full md:w-1/2 space-y-3">

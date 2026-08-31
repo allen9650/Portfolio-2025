@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun, Laptop, Menu, X } from "lucide-react";
@@ -17,7 +17,12 @@ const NAV_ITEMS = [
 const Navbar = () => {
   const { theme, setTheme, darkMode, colors } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleThemeCycle = () => {
     if (theme === 'dark') setTheme('light');
@@ -26,12 +31,14 @@ const Navbar = () => {
   };
 
   const getThemeIcon = () => {
+    if (!mounted) return <Moon className="h-4 w-4" />;
     if (theme === 'system') return <Laptop className="h-4 w-4" />;
     if (theme === 'light') return <Sun className="h-4 w-4" />;
     return <Moon className="h-4 w-4" />;
   };
 
   const getThemeLabel = () => {
+    if (!mounted) return "Dark Mode";
     if (theme === 'system') return "Device Default";
     if (theme === 'light') return "Light Mode";
     return "Dark Mode";
@@ -88,7 +95,7 @@ const Navbar = () => {
               className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border-slate-700/50 hover:bg-slate-500/10"
             >
               {getThemeIcon()}
-              <span className="hidden sm:inline capitalize">{theme}</span>
+              <span className="hidden sm:inline capitalize">{mounted ? theme : "dark"}</span>
             </Button>
 
             {/* Mobile Menu Button */}
