@@ -2,39 +2,135 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
+type ThemeMode = 'dark' | 'light' | 'system';
+
 type ThemeContextType = {
+  theme: ThemeMode;
+  setTheme: (theme: ThemeMode) => void;
+  resolvedTheme: 'dark' | 'light';
   darkMode: boolean;
-  toggleDarkMode: () => void;
+  toggleTheme: () => void;
   colors: {
     primary: string;
     secondary: string;
+    cardBorder: string;
     text: string;
+    textMuted: string;
     accent: string;
+    pastelSky: { bg: string; border: string; text: string };
+    pastelPurple: { bg: string; border: string; text: string };
+    pastelEmerald: { bg: string; border: string; text: string };
+    pastelRose: { bg: string; border: string; text: string };
+    pastelAmber: { bg: string; border: string; text: string };
+    pastelIndigo: { bg: string; border: string; text: string };
   };
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [darkMode, setDarkMode] = useState<boolean>(false);
+  const [theme, setThemeState] = useState<ThemeMode>('dark');
+  const [resolvedTheme, setResolvedTheme] = useState<'dark' | 'light'>('dark');
+
+  const applyTheme = (mode: ThemeMode) => {
+    let effectiveTheme: 'dark' | 'light' = 'dark';
+    if (mode === 'system') {
+      if (typeof window !== 'undefined') {
+        effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+    } else {
+      effectiveTheme = mode;
+    }
+
+    setResolvedTheme(effectiveTheme);
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.toggle('dark', effectiveTheme === 'dark');
+    }
+  };
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setDarkMode(window.matchMedia("(prefers-color-scheme: dark)").matches);
-    }
+    const savedTheme = (localStorage.getItem('theme') as ThemeMode) || 'dark';
+    setThemeState(savedTheme);
+    applyTheme(savedTheme);
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemChange = (e: MediaQueryListEvent) => {
+      const currentSaved = (localStorage.getItem('theme') as ThemeMode) || 'dark';
+      if (currentSaved === 'system') {
+        const nextEffective = e.matches ? 'dark' : 'light';
+        setResolvedTheme(nextEffective);
+        document.documentElement.classList.toggle('dark', nextEffective === 'dark');
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleSystemChange);
+    return () => mediaQuery.removeEventListener('change', handleSystemChange);
   }, []);
 
-  const toggleDarkMode = () => setDarkMode(!darkMode);
+  const setTheme = (newTheme: ThemeMode) => {
+    setThemeState(newTheme);
+    localStorage.setItem('theme', newTheme);
+    applyTheme(newTheme);
+  };
+
+  const toggleTheme = () => {
+    if (theme === 'dark') setTheme('light');
+    else if (theme === 'light') setTheme('system');
+    else setTheme('dark');
+  };
+
+  const darkMode = resolvedTheme === 'dark';
 
   const colors = {
-    primary: darkMode ? "bg-[#0F172A]" : "bg-[#F8FAFC]",
-    secondary: darkMode ? "bg-[#1E293B]" : "bg-[#F1F5F9]",
-    text: darkMode ? "text-gray-300" : "text-gray-700",
-    accent: darkMode ? "text-[#7DD3FC]" : "text-[#0369A1]",
+    primary: darkMode ? "bg-[#070A12]" : "bg-[#FAFBFD]",
+    secondary: darkMode ? "bg-[#0E1526]/85 backdrop-blur-xl" : "bg-white/90 backdrop-blur-xl",
+    cardBorder: darkMode ? "border-slate-800/90" : "border-slate-200/90",
+    text: darkMode ? "text-slate-100" : "text-slate-900",
+    textMuted: darkMode ? "text-slate-400" : "text-slate-600",
+    accent: darkMode ? "text-sky-400" : "text-sky-600",
+    pastelSky: {
+      bg: darkMode ? "bg-sky-950/40" : "bg-sky-50",
+      border: darkMode ? "border-sky-800/60" : "border-sky-200",
+      text: darkMode ? "text-sky-300" : "text-sky-700",
+    },
+    pastelPurple: {
+      bg: darkMode ? "bg-purple-950/40" : "bg-purple-50",
+      border: darkMode ? "border-purple-800/60" : "border-purple-200",
+      text: darkMode ? "text-purple-300" : "text-purple-700",
+    },
+    pastelEmerald: {
+      bg: darkMode ? "bg-emerald-950/40" : "bg-emerald-50",
+      border: darkMode ? "border-emerald-800/60" : "border-emerald-200",
+      text: darkMode ? "text-emerald-300" : "text-emerald-700",
+    },
+    pastelRose: {
+      bg: darkMode ? "bg-rose-950/40" : "bg-rose-50",
+      border: darkMode ? "border-rose-800/60" : "border-rose-200",
+      text: darkMode ? "text-rose-300" : "text-rose-700",
+    },
+    pastelAmber: {
+      bg: darkMode ? "bg-amber-950/40" : "bg-amber-50",
+      border: darkMode ? "border-amber-800/60" : "border-amber-200",
+      text: darkMode ? "text-amber-300" : "text-amber-700",
+    },
+    pastelIndigo: {
+      bg: darkMode ? "bg-indigo-950/40" : "bg-indigo-50",
+      border: darkMode ? "border-indigo-800/60" : "border-indigo-200",
+      text: darkMode ? "text-indigo-300" : "text-indigo-700",
+    },
   };
 
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleDarkMode, colors }}>
+    <ThemeContext.Provider
+      value={{
+        theme,
+        setTheme,
+        resolvedTheme,
+        darkMode,
+        toggleTheme,
+        colors,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

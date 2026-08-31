@@ -1,44 +1,42 @@
-'use client'
+'use client';
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useTheme } from '@/context/ThemeContext'
+import { useTheme } from "@/context/ThemeContext";
+import Navbar from "@/components/dashboard/Navbar";
+import Hero from "@/components/dashboard/Hero";
+import Experience from "@/components/dashboard/Experience";
+import Projects from "@/components/dashboard/Projects";
+import Skills from "@/components/dashboard/Skills";
+import Certifications from "@/components/dashboard/Certifications";
+import Achievements from "@/components/dashboard/Achievements";
+import Testimonials from "@/components/dashboard/Testimonials";
+import Contact from "@/components/dashboard/Contact";
+import Footer from "@/components/dashboard/Footer";
+import ScrollToTop from "@/components/dashboard/ScrollToTop";
 
 export default function Home() {
-  const router = useRouter()
-  const { colors } = useTheme()
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      router.push('/dashboard')
-    }, 2000)
-
-    return () => clearTimeout(timer)
-  }, [router])
+  const { colors } = useTheme();
 
   return (
-    <main className={`h-screen flex flex-col items-center justify-center px-4 text-center ${colors.primary} ${colors.text}`}>
-      {/* Avatar + Heading Skeleton */}
-      <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
-        {/* Avatar Circle */}
-        <Skeleton className={`w-32 h-32 rounded-full ${colors.secondary}`} />
+    <div className={`min-h-screen relative overflow-hidden transition-colors duration-300 ${colors.primary}`}>
+      {/* Decorative subtle professional glow gradients in background */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-sky-400/10 dark:bg-sky-500/5 rounded-full blur-[120px] pointer-events-none -z-10" />
+      <div className="absolute top-[25%] left-[-100px] w-[450px] h-[450px] bg-purple-400/10 dark:bg-purple-500/5 rounded-full blur-[120px] pointer-events-none -z-10" />
+      <div className="absolute top-[50%] right-[-100px] w-[500px] h-[500px] bg-emerald-400/10 dark:bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none -z-10" />
+      <div className="absolute bottom-0 left-[20%] w-[550px] h-[550px] bg-rose-400/10 dark:bg-rose-500/5 rounded-full blur-[120px] pointer-events-none -z-10" />
 
-        {/* Text block */}
-        <div className="space-y-4 text-left">
-          <Skeleton className={`h-8 w-48 ${colors.secondary}`} /> {/* Name */}
-          <Skeleton className={`h-6 w-64 ${colors.secondary}`} /> {/* Role line 1 */}
-          <Skeleton className={`h-6 w-60 ${colors.secondary}`} /> {/* Role line 2 */}
-          <Skeleton className={`h-6 w-56 ${colors.secondary}`} /> {/* Role line 3 */}
-
-          {/* Buttons Row */}
-          <div className="flex gap-4 pt-2">
-            <Skeleton className={`h-8 w-20 rounded-md ${colors.secondary}`} />
-            <Skeleton className={`h-8 w-8 rounded-md ${colors.secondary}`} />
-            <Skeleton className={`h-8 w-8 rounded-md ${colors.secondary}`} />
-          </div>
-        </div>
-      </div>
-    </main>
-  )
+      <Navbar />
+      <ScrollToTop />
+      <main className="space-y-8 md:space-y-14 relative z-0">
+        <Hero />
+        <Experience />
+        <Projects />
+        <Skills />
+        <Certifications />
+        <Achievements />
+        <Testimonials />
+        <Contact />
+      </main>
+      <Footer />
+    </div>
+  );
 }
